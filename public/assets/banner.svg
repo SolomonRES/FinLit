@@ -15,9 +15,11 @@
       <stop offset="50%" stop-color="white" stop-opacity="0.15"/>
       <stop offset="100%" stop-color="white" stop-opacity="0"/>
     </linearGradient>
+    <clipPath id="logoClip">
+      <circle cx="390" cy="80" r="18"/>
+    </clipPath>
   </defs>
 
-  <!-- Base background -->
   <rect width="900" height="160" fill="url(#bg)" rx="12"/>
 
   <!-- Subtle grid -->
@@ -30,14 +32,17 @@
   <circle cx="830" cy="20" r="110" fill="white" fill-opacity="0.025"/>
   <circle cx="70" cy="145" r="90" fill="white" fill-opacity="0.02"/>
 
-  <!-- Shimmer sweep -->
+  <!-- Shimmer -->
   <rect width="900" height="160" fill="url(#glow)" rx="12"/>
 
-  <!-- Accent line top -->
+  <!-- Top accent line -->
   <rect width="900" height="1" y="0" fill="url(#line)" rx="1"/>
 
-  <!-- Main wordmark -->
-  <text x="450" y="92" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif" font-size="58" font-weight="800" fill="white" text-anchor="middle" letter-spacing="-2">FinLit</text>
+  <!-- Logo image embedded as base64 -->
+  <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAK9SURBVHgBpZfJkeMwDEUBFWPpDFw+OXrfHdJwTLZAPXxCp2aVLXHD8rHKf35+/rm7jeG/w+J3rnX/nfTYP9fTubF/HIfH3hjfuXFe0WpYmAfsGiGMr8n3HJh7wZxC9uvaEibRGs+m2pMI5rFPDTsFJSoFvWC+EAiBGxjYjQYOIoSX64pWJ3KFYoHmRIDarndqK++9gHJp3b9Dzm+0KViTRfoBkbhwPqHkGextzuk3Dhh7TRcENhNNXbTptC3vfIFQIYjaXBtoNdrt4p2lpxAQMM4zgtb9AoEqDL0pZEBkPj+fzyXFqYW8c20br9fLIGQK5YHAQfNxg9r/ZYTWLn4yxoikFYbnRowOaefm4/GoHEqdbvnC+/1eNE++SZC403jIEQFyefNsmszEEQW9EJa+tfhEJozMFId6JcCN9pheSFAJ3jENwyggwiTgX4TInHCTqNyfQ2rAZroDjAgpvTYJh+FyrkOYi9hICELPr6iwVjgTkxIR6IUfTHgNNSNqRNyTmrFFBKvhYlhBCVtSgNhajqb3OPciGTVI1YUwU63an0JbgSLvJcQsj95A1BViyw6YLp/OtZwqup84TiaVadkPkOFtcbGiV+DdyJ5wSDXH5tgzEwq0Lppvtd9ywfEbM5TRI0xWQ2IgvFUrXO4F1IkJbL8hBEWSkCsVE74C/pHbt0RQDJfn5tTQfvJrxSHCan8dLv2hoX2fa8/ns/Og+20zwfcJcUTC+NNvAs+Jp/ymMHTFZJzsyHUxlUGrtG9Ft0waoO1N7L21zoTPa4fVqrjFvJqAz9QVwzb6TUAkhF5CzG7QpOkYBb1Bk9HTp+85wu3ShNIEEIhVtfQH0h6vByXU9DonV39IBsE1ZTmDz/gV+11odj5bAZd7EYaEzeCgdw0H7juTF6IlJaIlLQ5odSxr/Gm2LYF5LjpbKJ907D9BGOYm2AwPfwAAAABJRU5ErkJggg==" x="388" y="62" width="36" height="36" clip-path="url(#logoClip)"/>
+
+  <!-- Wordmark -->
+  <text x="435" y="92" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif" font-size="52" font-weight="800" fill="white" text-anchor="middle" letter-spacing="-2">FinLit</text>
 
   <!-- Tagline -->
   <text x="450" y="122" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif" font-size="12" font-weight="400" fill="#666666" text-anchor="middle" letter-spacing="3.5">FINANCIAL LITERACY PLATFORM</text>
