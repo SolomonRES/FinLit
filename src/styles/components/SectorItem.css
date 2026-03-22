@@ -1,0 +1,52 @@
+/* SECTOR ITEM */
+.prof-sector-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.prof-sector-item {
+    position: relative;
+}
+
+.prof-sector-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.prof-sector-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.prof-sector-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--color-neutral-700);
+    flex-shrink: 0;
+}
+
+.prof-sector-name {
+    font-weight: 600;
+    color: var(--color-neutral-900);
+    font-size: var(--text-sm);
+}
+
+.prof-sector-count {
+    font-size: var(--text-xs);
+    color: var(--color-neutral-600);
+}
+
+.prof-sector-pct {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-neutral-900);
+}
+
+.prof-sector-item .prof-progress-track {
+    height: 8px;
+}

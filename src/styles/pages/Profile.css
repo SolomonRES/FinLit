@@ -1,0 +1,151 @@
+/* PROFILE PAGE */
+
+.prof-header {
+    position: relative;
+    padding: calc(80px + var(--spacing-3xl)) var(--spacing-lg) var(--spacing-2xl);
+    overflow: hidden;
+    border-bottom: 1px solid var(--color-neutral-200);
+}
+
+.prof-header .grid-pattern {
+    opacity: 0.15;
+}
+
+.prof-header-content {
+    max-width: 1280px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.prof-name {
+    font-family: var(--font-heading);
+    font-size: var(--text-4xl);
+    font-weight: 800;
+    color: var(--color-neutral-900);
+    line-height: 1.1;
+    margin-bottom: var(--spacing-md);
+}
+
+.prof-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+    color: var(--color-neutral-600);
+    font-size: var(--text-sm);
+}
+
+.prof-meta-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.prof-meta-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.prof-streak-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 4px 12px;
+    background: var(--color-neutral-100);
+    border: 1px solid var(--color-neutral-200);
+    border-radius: var(--radius-full);
+}
+
+.prof-streak-badge .prof-meta-icon {
+    color: var(--color-neutral-700);
+}
+
+.prof-streak-text {
+    font-weight: 600;
+    color: var(--color-neutral-900);
+}
+
+/* profile content area */
+.prof-content {
+    padding: var(--spacing-2xl) var(--spacing-lg) var(--spacing-3xl);
+}
+
+.prof-container {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+/* 3-col layout: main 2/3 + sidebar 1/3 */
+.prof-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.prof-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.prof-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+/* full-width cards (skills + activity) */
+.prof-full-card {
+    margin-bottom: var(--spacing-xl);
+}
+
+/* MOBILE */
+@media (max-width: 767px) {
+    .prof-header {
+        padding: 100px var(--spacing-md) var(--spacing-xl);
+    }
+
+    .prof-name {
+        font-size: var(--text-2xl);
+    }
+
+    .prof-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+
+    .prof-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .prof-achievements-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* TABLET */
+@media (min-width: 768px) {
+    .prof-name {
+        font-size: var(--text-3xl);
+    }
+}
+
+/* DESKTOP */
+@media (min-width: 1024px) {
+    .prof-name {
+        font-size: var(--text-5xl);
+    }
+
+    .prof-layout {
+        grid-template-columns: 2fr 1fr;
+        align-items: start;
+    }
+
+    .prof-sidebar {
+        position: sticky;
+        top: 90px;
+    }
+}

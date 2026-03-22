@@ -1,0 +1,64 @@
+/* LOGO SCROLL (BANKS) */
+.logo-scroll {
+    padding: var(--spacing-xl) 0;
+    overflow: hidden;
+    background: var(--color-white);
+}
+
+.logo-track {
+    display: flex;
+    animation: scroll-logo 40s linear infinite;
+}
+
+.logo-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 var(--spacing-2xl);
+    font-size: var(--text-lg);
+    font-weight: var(--font-bold);
+    color: var(--color-neutral-600);
+    white-space: nowrap;
+    border-right: 1px solid var(--color-neutral-200);
+}
+
+.logo-img {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+    object-fit: contain;
+    border-radius: 3px;
+    background: var(--color-neutral-100);
+    padding: 2px;
+}
+
+@keyframes scroll-logo {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* MOBILE */
+@media (max-width: 767px) {
+    .logo-scroll {
+        padding: var(--spacing-md) 0;
+    }
+
+    .logo-item {
+        font-size: var(--text-sm);
+        padding: 0 var(--spacing-lg);
+        gap: 6px;
+    }
+
+    .logo-img {
+        width: 18px;
+        height: 18px;
+        min-width: 18px;
+        min-height: 18px;
+        padding: 1px;
+    }
+}

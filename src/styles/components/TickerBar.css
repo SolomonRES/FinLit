@@ -1,0 +1,112 @@
+/* STOCK TICKER */
+.ticker-section {
+    background: var(--color-neutral-100);
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--color-neutral-200);
+    overflow: hidden;
+}
+
+.ticker-track {
+    display: flex;
+    white-space: nowrap;
+    animation: scroll-ticker 40s linear infinite;
+}
+
+.ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 12px var(--spacing-lg);
+    border-right: 1px solid var(--color-neutral-200);
+}
+
+.ticker-symbol {
+    font-weight: var(--font-semibold);
+    font-size: var(--text-sm);
+    color: var(--color-neutral-900);
+}
+
+.ticker-logo {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    object-fit: contain;
+    border-radius: 3px;
+    background: var(--color-neutral-100);
+    padding: 2px;
+}
+
+.ticker-price {
+    font-size: var(--text-sm);
+    color: var(--color-neutral-600);
+}
+
+.ticker-change {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+}
+
+.ticker-change.positive {
+    color: var(--color-green-600);
+}
+
+.ticker-change.negative {
+    color: var(--color-red-600);
+}
+
+.ticker-icon {
+    width: 12px;
+    height: 12px;
+}
+
+@keyframes scroll-ticker {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* MOBILE */
+@media (max-width: 767px) {
+    .ticker-section {
+        padding: var(--spacing-xs) 0;
+        transform: none;
+        margin: 0;
+    }
+
+    .ticker-track {
+        animation-duration: 18s;
+    }
+
+    .ticker-item {
+        padding: 6px var(--spacing-sm);
+        gap: 4px;
+        border-right: none;
+    }
+
+    .ticker-symbol {
+        font-size: var(--text-xs);
+    }
+
+    .ticker-price {
+        font-size: 11px;
+    }
+
+    .ticker-change {
+        font-size: 10px;
+    }
+
+    .ticker-logo {
+        width: 14px;
+        height: 14px;
+        min-width: 14px;
+        min-height: 14px;
+        padding: 1px;
+    }
+}
