@@ -9,15 +9,21 @@ function ContactCTA() {
     e.preventDefault();
     setFormStatus('sending');
     const form = e.target;
-    const data = new FormData(form);
-    const email = data.get('email');
-    data.set('replyto', email);
+    const formData = new FormData(form);
+    const object = Object.fromEntries(formData);
+    const json = JSON.stringify(object);
+
     try {
       const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        body: data,
-      });
-      if (res.ok) {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: json,
+      }).then((res) => res.json());
+
+      if (res.success) {
         setFormStatus('success');
         form.reset();
       } else {
