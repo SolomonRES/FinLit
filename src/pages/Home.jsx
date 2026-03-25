@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Search, ChevronDown } from 'lucide-react';
 import Navbar from '../components/Navbar';
@@ -10,6 +10,8 @@ import LogoScroll from '../components/LogoScroll';
 import IndustrySection from '../components/IndustrySection';
 import CapabilitiesSection from '../components/CapabilitiesSection';
 import ContactCTA from '../components/ContactCTA';
+
+const WorldGlobe = lazy(() => import('../components/WorldGlobe'));
 
 function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -150,6 +152,11 @@ function Home() {
 
       {/* logo scroll */}
       <LogoScroll />
+
+      {/* global exchange globe */}
+      <Suspense fallback={<div className="globe-lazy-placeholder">Loading globe...</div>}>
+        <WorldGlobe />
+      </Suspense>
 
       {/* industry & cities section */}
       <IndustrySection />
