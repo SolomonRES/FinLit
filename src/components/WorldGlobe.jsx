@@ -206,10 +206,12 @@ function WorldGlobe() {
         {/* header */}
         <div className="globe-section-header">
           <div className="globe-title-group">
-            <GlobeIcon className="globe-title-icon" strokeWidth={2} />
             <div>
               <h2 className="globe-title">Global Exchange Network</h2>
-              <p className="globe-subtitle">Live capital flows between major world exchanges</p>
+              <p className="globe-subtitle">
+                <GlobeIcon className="globe-title-icon" strokeWidth={2} />
+                Live capital flows between major world exchanges
+              </p>
             </div>
           </div>
           <div className="globe-legend">
@@ -247,13 +249,13 @@ function WorldGlobe() {
               pointLng="lng"
               pointColor={getPointColor}
               pointAltitude={0.018}
-              pointRadius={0.5}
+              pointRadius={0.9}
               pointsMerge={false}
               pointLabel={getPointLabel}
               onPointClick={handlePointClick}
               onPointHover={handlePointHover}
 
-              /* all exchanges pulse simultaneously — the "animated" heartbeat */
+              /* all exchanges pulse simultaneously */
               ringsData={EXCHANGES}
               ringLat="lat"
               ringLng="lng"

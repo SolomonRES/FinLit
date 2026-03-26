@@ -41,14 +41,14 @@
 
 .globe-title-group {
   display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
+  align-items: flex-start;
+  gap: var(--spacing-md);
 }
 
 .globe-title-icon {
-  width: 20px;
-  height: 20px;
-  color: var(--color-neutral-700);
+  width: 16px;
+  height: 16px;
+  color: var(--color-neutral-500);
   flex-shrink: 0;
 }
 
@@ -60,6 +60,9 @@
 }
 
 .globe-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: var(--text-sm);
   color: var(--color-neutral-500);
 }
