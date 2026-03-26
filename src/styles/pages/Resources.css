@@ -504,8 +504,32 @@
         font-size: var(--text-2xl);
     }
 
+    .res-subtitle {
+        font-size: var(--text-base);
+    }
+
+    .res-content {
+        padding: 0 var(--spacing-md) var(--spacing-2xl);
+    }
+
+    .res-card {
+        padding: var(--spacing-md);
+    }
+
+    .res-overview-card {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .res-overview-value {
+        font-size: var(--text-lg);
+    }
+
     .res-overview-grid {
         grid-template-columns: 1fr 1fr;
+    }
+
+    .res-chart-wrapper {
+        height: 200px;
     }
 
     .res-ib-grid,
@@ -519,9 +543,36 @@
         grid-template-columns: 1fr;
     }
 
+    .res-pro-section {
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .res-pro-title {
+        font-size: var(--text-xl);
+    }
+
+    .res-connect-card {
+        padding: var(--spacing-lg);
+    }
+
     .res-connect-inner {
         flex-direction: column;
         text-align: center;
+        gap: var(--spacing-md);
+    }
+
+    .res-connect-icon {
+        align-self: center;
+    }
+
+    .res-connect-title {
+        font-size: var(--text-lg);
+    }
+
+    .res-disclaimer {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-md);
     }
 }
 

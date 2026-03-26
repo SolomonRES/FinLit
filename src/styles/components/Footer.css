@@ -2,7 +2,7 @@
 .footer {
     background: var(--color-neutral-900);
     color: var(--color-white);
-    padding: var(--spacing-3xl) 0 80px;
+    padding: var(--spacing-3xl) 0 calc(var(--spacing-2xl) + env(safe-area-inset-bottom, 0px));
 }
 
 .footer-content {
@@ -157,7 +157,7 @@
 /* MOBILE */
 @media (max-width: 767px) {
     .footer {
-        padding: var(--spacing-2xl) 0 80px;
+        padding: var(--spacing-2xl) 0 calc(var(--spacing-xl) + env(safe-area-inset-bottom, 0px));
     }
 
     .footer-logo-img {
@@ -204,7 +204,7 @@
 /* DESKTOP */
 @media (min-width: 1024px) {
     .footer {
-        padding: var(--spacing-3xl) 0;
+        padding: var(--spacing-3xl) 0 var(--spacing-2xl);
     }
 
     .footer-top {

@@ -117,12 +117,29 @@
         gap: var(--spacing-sm);
     }
 
+    .prof-content {
+        padding: var(--spacing-lg) var(--spacing-md) var(--spacing-2xl);
+    }
+
     .prof-stats-grid {
         grid-template-columns: 1fr;
     }
 
     .prof-achievements-grid {
         grid-template-columns: 1fr 1fr;
+    }
+
+    .prof-layout {
+        gap: var(--spacing-md);
+    }
+
+    .prof-main,
+    .prof-sidebar {
+        gap: var(--spacing-md);
+    }
+
+    .prof-full-card {
+        margin-bottom: var(--spacing-md);
     }
 }
 
