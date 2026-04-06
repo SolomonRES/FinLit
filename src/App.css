@@ -17,6 +17,7 @@
 /* Learning page components */
 @import './styles/components/ModuleItem.css';
 @import './styles/components/DomainCard.css';
+@import './styles/components/ModuleDrawer.css';
 
 /* Tools page components */
 @import './styles/components/ToolCard.css';
@@ -33,6 +34,7 @@
 /* Page-level styles */
 @import './styles/pages/Home.css';
 @import './styles/pages/Learning.css';
+@import './styles/pages/CourseDetail.css';
 @import './styles/pages/Tools.css';
 @import './styles/pages/Markets.css';
 @import './styles/pages/Resources.css';

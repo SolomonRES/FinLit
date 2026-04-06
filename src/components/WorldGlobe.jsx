@@ -158,7 +158,7 @@ function WorldGlobe() {
     document.body.style.cursor = point ? 'pointer' : 'default';
   }, []);
 
-  /* tooltip — dark card to match section */
+  /* tooltip - dark card to match section */
   const getPointLabel = useCallback((d) => `
     <div style="
       background:rgba(10,10,20,0.96);
@@ -179,7 +179,7 @@ function WorldGlobe() {
     </div>
   `, []);
 
-  /* dark-gray arcs — visible against the light section background */
+  /* dark-gray arcs - visible against the light section background */
   const getArcColor = useCallback(() => [
     'rgba(60,80,110,0.55)',
     'rgba(60,80,110,0.0)',

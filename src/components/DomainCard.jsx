@@ -11,8 +11,8 @@ const DOMAIN_ICONS = {
   ir: <Shield strokeWidth={2} />,
 };
 
-function DomainCard({ domainName, domainKey, modules, isFirst }) {
-  const [isOpen, setIsOpen] = useState(isFirst);
+function DomainCard({ domainName, domainKey, modules, onModuleClick }) {
+  const [isOpen, setIsOpen] = useState(false);
   const modulesRef = useRef(null);
 
   const completedCount = modules.filter(m => m.status === 'completed').length;
@@ -56,11 +56,11 @@ function DomainCard({ domainName, domainKey, modules, isFirst }) {
       <div
         className={`domain-modules${isOpen ? ' open' : ''}`}
         ref={modulesRef}
-        style={{ maxHeight: isFirst ? undefined : '0px' }}
+        style={{ maxHeight: '0px' }}
       >
         <div className="domain-modules-inner">
           {modules.map(mod => (
-            <ModuleItem key={mod._id} mod={mod} />
+            <ModuleItem key={mod._id} mod={mod} onOpen={onModuleClick} />
           ))}
         </div>
       </div>

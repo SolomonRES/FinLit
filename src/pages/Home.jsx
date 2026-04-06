@@ -153,7 +153,7 @@ function Home() {
       {/* logo scroll */}
       <LogoScroll />
 
-      {/* global exchange globe */}
+      {/* world-globe section */}
       <Suspense fallback={<div className="globe-lazy-placeholder">Loading globe...</div>}>
         <WorldGlobe />
       </Suspense>

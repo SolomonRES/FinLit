@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState } from 'react';
 import { Calculator, FileText, Download, DollarSign, TrendingUp, BarChart2, Coins, BarChart3, ArrowRight, Info } from 'lucide-react';
 

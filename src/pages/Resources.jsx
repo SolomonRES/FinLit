@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { BarChart3, TrendingUp, TrendingDown, Activity, Target, DollarSign, BookOpen, ArrowRight, FileText, Briefcase, BarChart2 } from 'lucide-react';
