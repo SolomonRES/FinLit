@@ -50,9 +50,11 @@ async function fetchQuotes(symbols) {
     if (!res.ok) throw new Error('API error');
     return await res.json();
   } catch {
-    return [];
+    return null; // null = network/server error, [] = empty response
   }
 }
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 function Markets() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -62,6 +64,7 @@ function Markets() {
   const [terminalSymbol, setTerminalSymbol] = useState('SPY');
   const [lastUpdated, setLastUpdated] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [serverWaking, setServerWaking] = useState(false);
 
   // Live data state
   const [indexData, setIndexData] = useState([]);
@@ -71,13 +74,24 @@ function Markets() {
   // Fetch live market data
   const fetchAllData = useCallback(async () => {
     setLoading(true);
+    setServerWaking(false);
     const allSymbols = [
       ...INDICES.map(i => i.symbol),
       ...FOREX_PAIRS.map(f => f.symbol),
       ...COMMODITIES.map(c => c.symbol),
     ];
 
-    const quotes = await fetchQuotes(allSymbols);
+    let quotes = null;
+    const MAX_RETRIES = 4;
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      quotes = await fetchQuotes(allSymbols);
+      if (quotes && quotes.length > 0) break;
+      if (attempt === 0) setServerWaking(true);
+      if (attempt < MAX_RETRIES - 1) await sleep(6000);
+    }
+    setServerWaking(false);
+    quotes = quotes || [];
+
     const map = {};
     quotes.forEach(q => { map[q.symbol] = q; });
 
@@ -249,7 +263,7 @@ function Markets() {
             <div className="markets-section-header">
               <Activity className="markets-section-icon" strokeWidth={2} />
               <h2 className="markets-section-title">Major Indices</h2>
-              {loading && <span className="data-loading-badge">Fetching live data...</span>}
+              {loading && <span className="data-loading-badge">{serverWaking ? 'Server waking up...' : 'Fetching live data...'}</span>}
             </div>
 
             <div className="indices-grid">
