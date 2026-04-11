@@ -694,7 +694,7 @@
   grid-template-rows: 24px 1fr 1fr 1fr;
   gap: 2px;
 }
-.rm-corner { /* empty top-left */ }
+
 .rm-col-header {
   font-size: 9px;
   font-weight: var(--font-bold);

@@ -1,38 +1,160 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Clock, TrendingUp, Activity, DollarSign, Target } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Clock, Activity, DollarSign, Target, PlusCircle, X, Eye, Maximize2, BarChart3, Zap } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import SidePanel from '../components/SidePanel';
 import Footer from '../components/Footer';
-import SPXChart from '../components/SPXChart';
 import MarketIndex from '../components/MarketIndex';
+import AddWatchlistForm from '../components/AddWatchlistForm';
+import { API_BASE } from '../config';
+
+const INDICES = [
+  { symbol: '^GSPC', display: 'SPX', name: 'S&P 500', region: 'US' },
+  { symbol: '^DJI', display: 'DJI', name: 'Dow Jones', region: 'US' },
+  { symbol: '^IXIC', display: 'IXIC', name: 'NASDAQ', region: 'US' },
+  { symbol: '^FTSE', display: 'UKX', name: 'FTSE 100', region: 'EU' },
+  { symbol: '^GDAXI', display: 'DAX', name: 'DAX', region: 'EU' },
+  { symbol: '^HSI', display: 'HSI', name: 'Hang Seng', region: 'APAC' },
+  { symbol: '^N225', display: 'NKY', name: 'Nikkei 225', region: 'APAC' },
+];
+
+const FOREX_PAIRS = [
+  { symbol: 'EURUSD=X', label: 'EUR/USD' },
+  { symbol: 'GBPUSD=X', label: 'GBP/USD' },
+  { symbol: 'JPY=X', label: 'USD/JPY' },
+  { symbol: 'CNY=X', label: 'USD/CNY' },
+];
+
+const COMMODITIES = [
+  { symbol: 'CL=F', label: 'WTI Crude', unit: '$/bbl' },
+  { symbol: 'GC=F', label: 'Gold', unit: '$/oz' },
+  { symbol: 'SI=F', label: 'Silver', unit: '$/oz' },
+  { symbol: 'NG=F', label: 'Natural Gas', unit: '$/MMBtu' },
+];
+
+function formatNum(n) {
+  if (n == null || isNaN(n)) return '—';
+  return n >= 1000 ? n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : n.toFixed(2);
+}
+
+function formatChange(change, pct) {
+  if (change == null) return { text: '—', positive: true };
+  const sign = change >= 0 ? '+' : '';
+  const p = pct != null ? ` (${sign}${pct.toFixed(2)}%)` : '';
+  return { text: `${sign}${formatNum(change)}${p}`, positive: change >= 0 };
+}
+
+async function fetchQuotes(symbols) {
+  const joined = symbols.join(',');
+  try {
+    const res = await fetch(`${API_BASE}/api/quotes?symbols=${encodeURIComponent(joined)}`);
+    if (!res.ok) throw new Error('API error');
+    return await res.json();
+  } catch {
+    return [];
+  }
+}
 
 function Markets() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const tradingviewWrapperRef = useRef(null);
+  const [showWatchlistForm, setShowWatchlistForm] = useState(false);
+  const [watchlist, setWatchlist] = useState([]);
+  const [showTerminal, setShowTerminal] = useState(false);
+  const [terminalSymbol, setTerminalSymbol] = useState('SPY');
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const marketTime = new Date().toLocaleTimeString();
+  // Live data state
+  const [indexData, setIndexData] = useState([]);
+  const [forexData, setForexData] = useState([]);
+  const [commodityData, setCommodityData] = useState([]);
 
-  const handleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      tradingviewWrapperRef.current && tradingviewWrapperRef.current.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
-  };
+  // Fetch live market data
+  const fetchAllData = useCallback(async () => {
+    setLoading(true);
+    const allSymbols = [
+      ...INDICES.map(i => i.symbol),
+      ...FOREX_PAIRS.map(f => f.symbol),
+      ...COMMODITIES.map(c => c.symbol),
+    ];
 
-  useEffect(() => {
-    const handler = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener('fullscreenchange', handler);
-    return () => document.removeEventListener('fullscreenchange', handler);
+    const quotes = await fetchQuotes(allSymbols);
+    const map = {};
+    quotes.forEach(q => { map[q.symbol] = q; });
+
+    setIndexData(INDICES.map(idx => {
+      const q = map[idx.symbol];
+      if (!q) return { ...idx, value: '—', change: '—', positive: true };
+      const ch = formatChange(q.regularMarketChange, q.regularMarketChangePercent);
+      return { ...idx, value: formatNum(q.regularMarketPrice), change: ch.text, positive: ch.positive };
+    }));
+
+    setForexData(FOREX_PAIRS.map(fp => {
+      const q = map[fp.symbol];
+      if (!q) return { ...fp, rate: '—', change: '—', positive: true };
+      const ch = formatChange(q.regularMarketChange, null);
+      return { ...fp, rate: formatNum(q.regularMarketPrice), change: ch.text, positive: ch.positive };
+    }));
+
+    setCommodityData(COMMODITIES.map(cm => {
+      const q = map[cm.symbol];
+      if (!q) return { ...cm, rate: '—', change: '—', positive: true };
+      const ch = formatChange(q.regularMarketChange, null);
+      return { ...cm, rate: formatNum(q.regularMarketPrice), change: ch.text, positive: ch.positive };
+    }));
+
+    setLastUpdated(new Date());
+    setLoading(false);
   }, []);
+
+  useEffect(() => { fetchAllData(); }, [fetchAllData]);
+
+  // Fetch watchlist
+  useEffect(() => {
+    fetch(`${API_BASE}/api/watchlist`)
+      .then(r => r.ok ? r.json() : [])
+      .then(setWatchlist)
+      .catch(() => {});
+  }, []);
+
+  const handleEntryAdded = useCallback((entry) => {
+    setWatchlist(prev => [...prev, entry]);
+  }, []);
+
+  const openTerminal = (sym) => {
+    setTerminalSymbol(sym || 'SPY');
+    setShowTerminal(true);
+  };
 
   return (
     <>
       <Navbar onOpenMenu={() => setMenuOpen(true)} />
       <SidePanel isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+
+      {/* TradingView Chart Modal */}
+      {showTerminal && (
+        <div className="terminal-overlay" onClick={() => setShowTerminal(false)}>
+          <div className="terminal-modal" onClick={e => e.stopPropagation()}>
+            <div className="terminal-topbar">
+              <div className="terminal-topbar-left">
+                <BarChart3 size={18} strokeWidth={2} />
+                <span className="terminal-title">Live Chart</span>
+                <span className="terminal-symbol-badge">{terminalSymbol}</span>
+              </div>
+              <button className="terminal-close" onClick={() => setShowTerminal(false)}>
+                <X size={18} />
+              </button>
+            </div>
+            <div className="terminal-body">
+              <iframe
+                src={`https://s.tradingview.com/widgetembed/?frameElementId=tradingview_widget&symbol=${encodeURIComponent(terminalSymbol)}&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=%5B%5D&theme=light&style=1&timezone=America%2FNew_York&withdateranges=1&showpopupbutton=1&locale=en`}
+                title={`${terminalSymbol} Chart`}
+                className="terminal-iframe"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* markets header */}
       <section className="markets-header">
@@ -47,9 +169,17 @@ function Markets() {
               <h1 className="markets-title">Global Markets</h1>
               <p className="markets-subtitle">Real-time market intelligence across major exchanges</p>
             </div>
-            <div className="markets-updated">
-              <Clock className="markets-clock-icon" strokeWidth={2} />
-              <span>Updated: <span id="marketTime">{marketTime}</span></span>
+            <div className="markets-header-actions">
+              {lastUpdated && (
+                <div className="markets-updated" style={{ display: 'flex' }}>
+                  <Clock className="markets-clock-icon" strokeWidth={2} />
+                  <span>Updated: {lastUpdated.toLocaleTimeString()}</span>
+                </div>
+              )}
+              <button className="terminal-launch-btn" onClick={() => openTerminal('SPY')}>
+                <Maximize2 size={16} />
+                Live Chart
+              </button>
             </div>
           </div>
         </div>
@@ -59,49 +189,59 @@ function Markets() {
       <div className="markets-content">
         <div className="markets-container">
 
-          {/* Live Market Chart (TradingView iframe) */}
-          <section className="tradingview-section">
-            <div className="tradingview-header">
-              <div className="tradingview-header-left">
-                <TrendingUp className="markets-section-icon" strokeWidth={2} />
-                <h3>Live Market Chart</h3>
+          {/* Quick chart ticker buttons */}
+          <section className="quick-charts-section">
+            <div className="quick-charts-bar">
+              <Zap size={14} strokeWidth={2.5} />
+              <span className="quick-charts-label">Quick Charts:</span>
+              {['SPY', 'QQQ', 'DIA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'BTC-USD', 'GC=F'].map(sym => (
+                <button key={sym} className="quick-chart-btn" onClick={() => openTerminal(sym)}>
+                  {sym}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* watchlist section */}
+          <section className="markets-section">
+            <div className="markets-section-header" style={{ justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Eye className="markets-section-icon" strokeWidth={2} />
+                <h2 className="markets-section-title">My Watchlist</h2>
               </div>
-              <p className="tradingview-desc">Real-time S&P 500 chart powered by TradingView. Interact with indicators, time-frames, and drawing tools.</p>
-            </div>
-            <div className="tradingview-wrapper" id="tradingviewWrapper" ref={tradingviewWrapperRef}>
               <button
-                className="tradingview-fullscreen-btn"
-                id="tradingviewFullscreenBtn"
-                title="Toggle fullscreen"
-                onClick={handleFullscreen}
+                className="watchlist-toggle"
+                onClick={() => setShowWatchlistForm(prev => !prev)}
+                type="button"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  {isFullscreen ? (
-                    <>
-                      <polyline points="4 14 10 14 10 20"></polyline>
-                      <polyline points="20 10 14 10 14 4"></polyline>
-                      <line x1="14" y1="10" x2="21" y2="3"></line>
-                      <line x1="3" y1="21" x2="10" y2="14"></line>
-                    </>
-                  ) : (
-                    <>
-                      <polyline points="15 3 21 3 21 9"></polyline>
-                      <polyline points="9 21 3 21 3 15"></polyline>
-                      <line x1="21" y1="3" x2="14" y2="10"></line>
-                      <line x1="3" y1="21" x2="10" y2="14"></line>
-                    </>
-                  )}
-                </svg>
+                {showWatchlistForm ? <><X size={16} /> Close</> : <><PlusCircle size={16} /> Add Stock</>}
               </button>
-              <iframe
-                src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_widget&symbol=AMEX%3ASPY&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=%5B%5D&theme=light&style=1&timezone=America%2FNew_York&withdateranges=1&showpopupbutton=1&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&showpopupbutton=1&locale=en&utm_source=localhost&utm_medium=widget_new&utm_campaign=chart"
-                title="TradingView S&P 500 Chart"
-                className="tradingview-iframe"
-                allowTransparency="true"
-                frameBorder="0"
-                allowFullScreen
-              ></iframe>
             </div>
+
+            {showWatchlistForm && <AddWatchlistForm onEntryAdded={handleEntryAdded} />}
+
+            {watchlist.length > 0 ? (
+              <div className="data-table glass-card watchlist-entries">
+                <div className="watchlist-entry-row watchlist-header-row">
+                  <span>Symbol</span>
+                  <span>Company</span>
+                  <span style={{ textAlign: 'right' }}>Target</span>
+                  <span style={{ textAlign: 'center' }}>Sector</span>
+                </div>
+                {watchlist.map(w => (
+                  <div className="watchlist-entry-row" key={w._id} onClick={() => openTerminal(w.symbol)} style={{ cursor: 'pointer' }}>
+                    <span className="watchlist-symbol">{w.symbol}</span>
+                    <span className="watchlist-name">{w.name}</span>
+                    <span className="watchlist-price">${Number(w.targetPrice).toFixed(2)}</span>
+                    <span className="watchlist-sector-tag">{w.sector}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="data-table glass-card">
+                <p className="watchlist-empty">No stocks on your watchlist yet. Add one above!</p>
+              </div>
+            )}
           </section>
 
           {/* major indices */}
@@ -109,21 +249,26 @@ function Markets() {
             <div className="markets-section-header">
               <Activity className="markets-section-icon" strokeWidth={2} />
               <h2 className="markets-section-title">Major Indices</h2>
+              {loading && <span className="data-loading-badge">Fetching live data...</span>}
             </div>
 
             <div className="indices-grid">
-              <MarketIndex symbol="SPX" name="S&amp;P 500" region="US" value="4,760.12" change="+34.35 (+0.73%)" positive={true} />
-              <MarketIndex symbol="DJI" name="Dow Jones" region="US" value="37,529.84" change="+218.96 (+0.59%)" positive={true} />
-              <MarketIndex symbol="IXIC" name="NASDAQ" region="US" value="14,864.85" change="+123.74 (+0.84%)" positive={true} />
-              <MarketIndex symbol="UKX" name="FTSE 100" region="EU" value="7,632.45" change="-22.14 (-0.29%)" positive={false} />
-              <MarketIndex symbol="DAX" name="DAX" region="EU" value="16,758.23" change="+45.67 (+0.27%)" positive={true} />
-              <MarketIndex symbol="HSI" name="Hang Seng" region="APAC" value="16,334.91" change="-134.22 (-0.81%)" positive={false} />
-              <MarketIndex symbol="NKY" name="Nikkei 225" region="APAC" value="35,489.57" change="+289.12 (+0.82%)" positive={true} />
+              {indexData.length > 0 ? indexData.map(idx => (
+                <div key={idx.display} onClick={() => openTerminal(idx.symbol)} style={{ cursor: 'pointer' }}>
+                  <MarketIndex
+                    symbol={idx.display}
+                    name={idx.name}
+                    region={idx.region}
+                    value={idx.value}
+                    change={idx.change}
+                    positive={idx.positive}
+                  />
+                </div>
+              )) : INDICES.map(idx => (
+                <MarketIndex key={idx.display} symbol={idx.display} name={idx.name} region={idx.region} value="—" change="—" positive={true} />
+              ))}
             </div>
           </section>
-
-          {/* charts section */}
-          <SPXChart />
 
           {/* currencies & commodities */}
           <section className="markets-section">
@@ -135,34 +280,23 @@ function Markets() {
                   <h2 className="markets-section-title">Currencies</h2>
                 </div>
                 <div className="data-table glass-card">
-                  <div className="data-row">
-                    <div className="data-pair">EUR/USD</div>
-                    <div className="data-values">
-                      <span className="data-rate">1.0847</span>
-                      <span className="data-change positive">+0.0012</span>
+                  {forexData.length > 0 ? forexData.map((fp, i) => (
+                    <div className={`data-row${i === forexData.length - 1 ? ' last' : ''}`} key={fp.symbol}>
+                      <div className="data-pair">{fp.label}</div>
+                      <div className="data-values">
+                        <span className="data-rate">{fp.rate}</span>
+                        <span className={`data-change ${fp.positive ? 'positive' : 'negative'}`}>{fp.change}</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="data-row">
-                    <div className="data-pair">GBP/USD</div>
-                    <div className="data-values">
-                      <span className="data-rate">1.2634</span>
-                      <span className="data-change negative">-0.0023</span>
+                  )) : FOREX_PAIRS.map((fp, i) => (
+                    <div className={`data-row${i === FOREX_PAIRS.length - 1 ? ' last' : ''}`} key={fp.symbol}>
+                      <div className="data-pair">{fp.label}</div>
+                      <div className="data-values">
+                        <span className="data-rate">—</span>
+                        <span className="data-change positive">—</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="data-row">
-                    <div className="data-pair">USD/JPY</div>
-                    <div className="data-values">
-                      <span className="data-rate">148.73</span>
-                      <span className="data-change positive">+0.45</span>
-                    </div>
-                  </div>
-                  <div className="data-row last">
-                    <div className="data-pair">USD/CNY</div>
-                    <div className="data-values">
-                      <span className="data-rate">7.2456</span>
-                      <span className="data-change negative">-0.0089</span>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
 
@@ -173,46 +307,29 @@ function Markets() {
                   <h2 className="markets-section-title">Commodities</h2>
                 </div>
                 <div className="data-table glass-card">
-                  <div className="data-row">
-                    <div>
-                      <div className="data-pair">WTI Crude</div>
-                      <div className="data-unit">$/bbl</div>
+                  {commodityData.length > 0 ? commodityData.map((cm, i) => (
+                    <div className={`data-row${i === commodityData.length - 1 ? ' last' : ''}`} key={cm.symbol} onClick={() => openTerminal(cm.symbol)} style={{ cursor: 'pointer' }}>
+                      <div>
+                        <div className="data-pair">{cm.label}</div>
+                        <div className="data-unit">{cm.unit}</div>
+                      </div>
+                      <div className="data-values">
+                        <span className="data-rate">{cm.rate}</span>
+                        <span className={`data-change ${cm.positive ? 'positive' : 'negative'}`}>{cm.change}</span>
+                      </div>
                     </div>
-                    <div className="data-values">
-                      <span className="data-rate">78.45</span>
-                      <span className="data-change positive">+1.23</span>
+                  )) : COMMODITIES.map((cm, i) => (
+                    <div className={`data-row${i === COMMODITIES.length - 1 ? ' last' : ''}`} key={cm.symbol}>
+                      <div>
+                        <div className="data-pair">{cm.label}</div>
+                        <div className="data-unit">{cm.unit}</div>
+                      </div>
+                      <div className="data-values">
+                        <span className="data-rate">—</span>
+                        <span className="data-change positive">—</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="data-row">
-                    <div>
-                      <div className="data-pair">Gold</div>
-                      <div className="data-unit">$/oz</div>
-                    </div>
-                    <div className="data-values">
-                      <span className="data-rate">2,034.50</span>
-                      <span className="data-change negative">-8.70</span>
-                    </div>
-                  </div>
-                  <div className="data-row">
-                    <div>
-                      <div className="data-pair">Silver</div>
-                      <div className="data-unit">$/oz</div>
-                    </div>
-                    <div className="data-values">
-                      <span className="data-rate">23.12</span>
-                      <span className="data-change positive">+0.34</span>
-                    </div>
-                  </div>
-                  <div className="data-row last">
-                    <div>
-                      <div className="data-pair">Natural Gas</div>
-                      <div className="data-unit">$/MMBtu</div>
-                    </div>
-                    <div className="data-values">
-                      <span className="data-rate">2.67</span>
-                      <span className="data-change positive">+0.09</span>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
