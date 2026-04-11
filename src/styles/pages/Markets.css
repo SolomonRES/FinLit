@@ -280,6 +280,12 @@
     letter-spacing: 0.04em;
 }
 
+/* Disable slow glass-card fadeInUp on Markets page */
+.markets-content .glass-card {
+    animation-duration: 0.001s;
+    animation-delay: 0s;
+}
+
 /* markets content area */
 .markets-content {
     padding: var(--spacing-2xl) 0;

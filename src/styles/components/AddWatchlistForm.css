@@ -1,5 +1,10 @@
 /* WATCHLIST FORM */
 
+@keyframes wl-fade-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .watchlist-form-card {
   background: var(--glass-bg);
   backdrop-filter: blur(var(--blur-sm));
@@ -9,6 +14,7 @@
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
+  animation: wl-fade-in 0.15s ease;
 }
 
 .watchlist-form-header {
