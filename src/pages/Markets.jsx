@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Clock, Activity, DollarSign, Target, PlusCircle, X, Eye, Maximize2, BarChart3, Zap } from 'lucide-react';
+import { Clock, Activity, DollarSign, Target, PlusCircle, X, Eye, Maximize2, BarChart3, Zap, Pencil, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import SidePanel from '../components/SidePanel';
 import Footer from '../components/Footer';
 import MarketIndex from '../components/MarketIndex';
 import AddWatchlistForm from '../components/AddWatchlistForm';
+import EditWatchlistForm from '../components/EditWatchlistForm';
 import { API_BASE } from '../config';
 
 const INDICES = [
@@ -60,6 +61,8 @@ function Markets() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showWatchlistForm, setShowWatchlistForm] = useState(false);
   const [watchlist, setWatchlist] = useState([]);
+  const [editingEntry, setEditingEntry] = useState(null);
+  const [watchlistNotif, setWatchlistNotif] = useState(null);
   const [showTerminal, setShowTerminal] = useState(false);
   const [terminalSymbol, setTerminalSymbol] = useState('SPY');
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -130,8 +133,34 @@ function Markets() {
       .catch(() => {});
   }, []);
 
+  useEffect(() => {
+    if (!watchlistNotif) return;
+    const t = setTimeout(() => setWatchlistNotif(null), 4000);
+    return () => clearTimeout(t);
+  }, [watchlistNotif]);
+
   const handleEntryAdded = useCallback((entry) => {
     setWatchlist(prev => [...prev, entry]);
+  }, []);
+
+  const handleEntryUpdated = useCallback((updated) => {
+    setWatchlist(prev => prev.map(w => w._id === updated._id ? updated : w));
+    setEditingEntry(null);
+    setWatchlistNotif({ type: 'success', msg: `${updated.symbol} updated successfully` });
+  }, []);
+
+  const handleDelete = useCallback(async (id) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/watchlist/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setWatchlist(prev => prev.filter(w => w._id !== id));
+        setWatchlistNotif({ type: 'success', msg: 'Entry removed from watchlist' });
+      } else {
+        setWatchlistNotif({ type: 'error', msg: 'Could not delete entry. Please try again.' });
+      }
+    } catch {
+      setWatchlistNotif({ type: 'error', msg: 'Could not reach the server.' });
+    }
   }, []);
 
   const openTerminal = (sym) => {
@@ -225,7 +254,7 @@ function Markets() {
               </div>
               <button
                 className="watchlist-toggle"
-                onClick={() => setShowWatchlistForm(prev => !prev)}
+                onClick={() => { setShowWatchlistForm(prev => !prev); setEditingEntry(null); }}
                 type="button"
               >
                 {showWatchlistForm ? <><X size={16} /> Close</> : <><PlusCircle size={16} /> Add Stock</>}
@@ -233,6 +262,22 @@ function Markets() {
             </div>
 
             {showWatchlistForm && <AddWatchlistForm onEntryAdded={handleEntryAdded} />}
+            {editingEntry && (
+              <EditWatchlistForm
+                entry={editingEntry}
+                onEntryUpdated={handleEntryUpdated}
+                onCancel={() => setEditingEntry(null)}
+              />
+            )}
+
+            {watchlistNotif && (
+              <div className={`watchlist-banner ${watchlistNotif.type}`}>
+                {watchlistNotif.type === 'success'
+                  ? <CheckCircle2 size={16} />
+                  : <AlertCircle size={16} />}
+                {watchlistNotif.msg}
+              </div>
+            )}
 
             {watchlist.length > 0 ? (
               <div className="data-table glass-card watchlist-entries">
@@ -240,14 +285,31 @@ function Markets() {
                   <span>Symbol</span>
                   <span>Company</span>
                   <span style={{ textAlign: 'right' }}>Target</span>
-                  <span style={{ textAlign: 'center' }}>Sector</span>
+                  <span className="watchlist-sector-col" style={{ textAlign: 'center' }}>Sector</span>
+                  <span style={{ textAlign: 'right' }}>Actions</span>
                 </div>
                 {watchlist.map(w => (
                   <div className="watchlist-entry-row" key={w._id} onClick={() => openTerminal(w.symbol)} style={{ cursor: 'pointer' }}>
                     <span className="watchlist-symbol">{w.symbol}</span>
                     <span className="watchlist-name">{w.name}</span>
                     <span className="watchlist-price">${Number(w.targetPrice).toFixed(2)}</span>
-                    <span className="watchlist-sector-tag">{w.sector}</span>
+                    <span className="watchlist-sector-tag watchlist-sector-col">{w.sector}</span>
+                    <span className="watchlist-actions" onClick={e => e.stopPropagation()}>
+                      <button
+                        className="watchlist-action-btn edit"
+                        title="Edit entry"
+                        onClick={() => { setEditingEntry(w); setShowWatchlistForm(false); }}
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      <button
+                        className="watchlist-action-btn delete"
+                        title="Delete entry"
+                        onClick={() => handleDelete(w._id)}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </span>
                   </div>
                 ))}
               </div>
